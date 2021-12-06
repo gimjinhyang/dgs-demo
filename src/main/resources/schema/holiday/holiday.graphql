@@ -1,0 +1,10 @@
+type HolidayMonth {
+    year: Int
+    month: Int
+    dayList : [HolidayDay]
+}
+
+type HolidayDay {
+    day: Int
+    name: String
+}

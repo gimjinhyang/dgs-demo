@@ -1,3 +1,4 @@
 type Query {
     shows(titleFilter: String): [Show]
+    holiday(year: Int, month: Int): HolidayMonth
 }
