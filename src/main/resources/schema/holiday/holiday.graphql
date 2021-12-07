@@ -1,3 +1,9 @@
+type Holiday {
+    year: Int
+    month: Int
+    dayList : [HolidayDay]
+}
+
 type HolidayMonth {
     year: Int
     month: Int

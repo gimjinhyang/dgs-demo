@@ -16,14 +16,13 @@ $(function () {
 
             // make the event draggable using jQuery UI
             $(this).draggable({
-                zIndex: 1070,
-                revert: true, // will cause the event to go back to its
-                revertDuration: 0  //  original position after the drag
-            })
+                                  zIndex: 1070,
+                                  revert: true, // will cause the event to go back to its
+                                  revertDuration: 0  //  original position after the drag
+                              })
 
         })
     }
-
 
     ini_events($('#external-events div.external-event'))
 
@@ -47,13 +46,14 @@ $(function () {
         eventData: function (eventEl) {
             return {
                 title: eventEl.innerText,
-                backgroundColor: window.getComputedStyle(eventEl, null).getPropertyValue('background-color'),
-                borderColor: window.getComputedStyle(eventEl, null).getPropertyValue('background-color'),
+                backgroundColor: window.getComputedStyle(eventEl, null)
+                    .getPropertyValue('background-color'),
+                borderColor: window.getComputedStyle(eventEl, null)
+                    .getPropertyValue('background-color'),
                 textColor: window.getComputedStyle(eventEl, null).getPropertyValue('color'),
             };
         }
     });
-
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
         headerToolbar: {
@@ -127,9 +127,9 @@ $(function () {
         currColor = $(this).css('color')
         // Add color effect to button
         $('#add-new-event').css({
-            'background-color': currColor,
-            'border-color': currColor
-        })
+                                    'background-color': currColor,
+                                    'border-color': currColor
+                                })
     })
     $('#add-new-event').click(function (e) {
         e.preventDefault()
@@ -142,10 +142,10 @@ $(function () {
         // Create events
         var event = $('<div />')
         event.css({
-            'background-color': currColor,
-            'border-color': currColor,
-            'color': '#fff'
-        }).addClass('external-event')
+                      'background-color': currColor,
+                      'border-color': currColor,
+                      'color': '#fff'
+                  }).addClass('external-event')
         event.text(val)
         $('#external-events').prepend(event)
 
@@ -156,27 +156,63 @@ $(function () {
         $('#new-event').val('')
     })
 
+    // console.log(m)
 
-    console.log(m)
+    // $.ajax({
+    //            url: "/api/holiday/list?year=" + y + "&month=" + (m + 1),
+    //            type: "GET",
+    //            dataType: "json",
+    //            success: function (rs, st) {
+    //
+    //                $.each(rs.list, function (i, v) {
+    //                    calendar.addEvent({
+    //                                          title: v.name,
+    //                                          start: new Date(v.year, (v.month - 1), v.day),
+    //                                          backgroundColor: '#f56954',
+    //                                          borderColor: '#f56954',
+    //                                          allDay: true
+    //                                      });
+    //                });
+    //
+    //            }
+    //        });
 
-    $.ajax({
-        url: "/api/holiday/list?year=" + y + "&month=" + (m + 1),
-        type: "GET",
-        dataType: "json",
-        success: function (rs, st) {
+    var query = `query HolidayMonth($y: Int, $month: Int) {
+                    holidayMonth(year: $y, month: $month) {
+                        year
+                        month
+                        dayList {
+                            day
+                            name
+                        }
+                    }
+                }`;
 
-            $.each(rs.list, function (i, v) {
+    var month = m + 1;
+
+    fetch('/graphql', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+                                 query,
+                                 variables: {y, month},
+                             })
+    })
+        .then(r => r.json())
+        .then(j => j.data.holiday)
+        .then(month => {
+            $.each(month.dayList, function (i, v) {
                 calendar.addEvent({
-                    title: v.name,
-                    start: new Date(v.year, (v.month - 1), v.day),
-                    backgroundColor: '#f56954',
-                    borderColor: '#f56954',
-                    allDay: true
-                });
+                                      title: v.name,
+                                      start: new Date(month.year, (month.month - 1), v.day),
+                                      backgroundColor: '#f56954',
+                                      borderColor: '#f56954',
+                                      allDay: true
+                                  });
             });
-
-        }
-    });
-
+        });
 
 })

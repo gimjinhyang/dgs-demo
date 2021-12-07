@@ -1,5 +1,6 @@
 package demo.holiday.service
 
+import demo.holiday.model.HolidayDay
 import demo.holiday.model.HolidayMonth
 import demo.jpa.holiday.model.HolidayMonthEntity
 import demo.jpa.holiday.repository.HolidayMonthJpaRepository
@@ -51,5 +52,23 @@ class HolidayService(
     private fun getMonthEntity(year: Int, month: Int): Optional<HolidayMonthEntity> {
         return holidayMonthJpaRepository.findTopByYearAndMonth(year, month)
     }
+
+    fun getDayList(year: Int, month: Int): List<HolidayDay> {
+        val hash = getMonthHash(year, month)
+        if (hash.isPresent) {
+            return hash.get().dayList.map { HolidayDay(it) }.toList()
+        }
+
+        val entity = getMonthEntity(year, month)
+        if (entity.isPresent) {
+            saveMonthHash(entity.get())
+            return entity.get().dayList.map { HolidayDay(it) }.toList()
+        }
+
+        val itemList = spcdeInfoService.getHoliDeInfo(year, month)
+        saveMonthEntity(year, month, itemList)
+        return itemList.map { HolidayDay(it) }.toList()
+    }
+
 
 }

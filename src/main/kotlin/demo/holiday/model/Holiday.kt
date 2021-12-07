@@ -4,7 +4,7 @@ import demo.jpa.holiday.model.HolidayMonthEntity
 import demo.openapi.datagokr.model.SpcdeInfoItem
 import demo.redis.holiday.model.HolidayMonthHash
 
-class HolidayMonth {
+class Holiday {
 
     val year: Int
 
